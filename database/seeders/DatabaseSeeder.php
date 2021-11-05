@@ -4,6 +4,10 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\niveldeusuario;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -13,6 +17,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        User::create([
+            'name' =>'Administrador',
+            'email' => 'adminrestaurante@restaurante-local.com',
+            'password' => Hash::make('ResT@uranteLocal'),
+            'id_nivel' => 1,
+        ]);
+        niveldeusuario::create([
+            'name' =>'Administradores',
+        ]);
+        niveldeusuario::create([
+            'name' =>'Mesonero',
+        ]);
     }
 }

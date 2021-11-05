@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-class niveldeusuario extends Model
+class mesas extends Model
 {
     use HasFactory;
-    protected $table = 'nivel_usuario';
+    protected $table = 'mesas';
     protected $fillable = [
         'name',
+        'cantidad_personas',
+        'active',
+        'orden_active',
     ];
 }

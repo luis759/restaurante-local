@@ -46,7 +46,9 @@ class LoginController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::guard('admin')->attempt($credentials)) {
+        if(Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password,'id_nivel'=>'1'])){
+            return redirect()->route('home');
+        }else if (Auth::guard('mesero')->attempt(['email' => $request->email, 'password' => $request->password])) {
             return redirect()->route('home');
         }
 
