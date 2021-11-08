@@ -12,27 +12,36 @@
                 <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Nombre *:</label>
                     <div class="col-sm-8">
-                     <input type="text" class="form-control" id="name" placeholder="Nombre" value='{{$dataEdit->name}}'>
+                     <input  type="text" class="form-control" id="name" placeholder="Nombre" value='{{$dataEdit->name}}'>
                     </div>
                 </div>
             <div class="form-group row">
-                <label for="name" class="col-sm-6 col-form-label">Cantidad de Personas *:</label>
-                <div class="col-sm-6">
-                    input type="number" class="form-control" id="cantidad_personas" placeholder="" value='{{$dataEdit->cantidad_personas}}'>
+                <label for="id_nivel"   class="col-sm-3 col-form-label">Nivel *:</label>
+                <select class="form-control col-sm-8"  id="id_nivel"   value="{{$dataEdit->id_nivel}}">
+                @foreach ($DataNiveles as $DataNiveles)
+                        <option value="{{$DataNiveles->id}}"  {{$dataEdit->id_nivel == $DataNiveles->id?'selected':''}}>{{$DataNiveles->name}}</option>
+                @endforeach
+                </select>
+            </div>
+            <div class="form-group row">
+                <label for="email" class="col-sm-4 col-form-label">Correo *:</label>
+                <div class="col-sm-8">
+                     <input {{$opcion?'':'disabled'}}  type="email" class="form-control" id="email" placeholder="Correo@g.com" value='{{$dataEdit->email}}'>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="name" class="col-sm-4 col-form-label">Mesa Activa *:</label>
-                <div class="col-sm-8">
-                    <input class="form-check-input" type="checkbox" value="" id="active" {{$dataEdit->active?'checked':''}}>
+                <label for="name" class="col-sm-5 col-form-label">{{$opcion?'':'Cambiar'}} Contraseña *:</label>
+                <div class="col-sm-7">
+                     <input type="password" class="form-control" id="password" placeholder="" value=''>
                 </div>
             </div>
             <div class="form-group row">
-                <label for="name" class="col-sm-4 col-form-label">Numero de Orden*:</label>
-                <div class="col-sm-8">
-                <input type="number" class="form-control" id="orden_active" placeholder="" value='{{$dataEdit->orden_active}}'>
+                <label for="name" class="col-sm-5 col-form-label">Repetir Contraseña *:</label>
+                <div class="col-sm-7">
+                     <input type="password" class="form-control" id="password_confirmation" placeholder="" value=''>
                 </div>
             </div>
+            <input type="hidden" id="passverifi"value='{{$dataEdit->password}}'>
             </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="botonmodal">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
@@ -48,11 +57,13 @@
             @if (isset($dataEdit->id))
             $(document).on('click', '#botonmodal', function(event) {
                 event.preventDefault();
+                $("#botonmodal").attr("disabled", true);
                 var datas =  {
                     name: $('#name').val(),
-                    cantidad_personas: $('#cantidad_personas').val(),
-                    active: $('#active').is(":checked")?1:0,
-                    orden_active: $('#orden_active').val()
+                    id_nivel: $('#id_nivel').val(),
+                    password: $('#password').val(),
+                    password_confirmation: $('#password_confirmation').val(),
+                    email: $('#email').val()
                 }
                 $.ajax({ 
                     type: "PUT",
@@ -64,22 +75,29 @@
                             $('#table_id').DataTable( {
                                         paging: true,
                                     });
+                                    
+                $("#botonmodal").attr("disabled", false);
                         });
                 }); 
             @else
             $(document).on('click', '#botonmodal', function(event) {
                 event.preventDefault();
+                $("#botonmodal").attr("disabled", true);
                 var datas =  {
                     name: $('#name').val(),
-                    cantidad_personas: $('#cantidad_personas').val(),
-                    active: $('#active').val()?1:0,
-                    orden_active: $('#orden_active').val()
+                    id_nivel: $('#id_nivel').val(),
+                    password: $('#password').val(),
+                    password_confirmation: $('#password_confirmation').val(),
+                    email: $('#email').val()
                 }
+                console.log(datas)
                 $.ajax({ 
                     type: "post",
                     url: "{{route('usuarios-admin-add')}}", 
                     data: datas,
                         }).done(function(data){
+                            
+                $("#botonmodal").attr("disabled", false);
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {
