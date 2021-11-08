@@ -6,6 +6,7 @@
                         <h5 class="card-title">Usuarios</h5>
                         <p class="card-text" style="height:50px;">Si deseas agregar nuevos Meseros o Administradores.</p>
                     </div>
+                    <a href="{{ route('usuarios-admin') }}" class="stretched-link"></a>
             </div>
             
     </div>

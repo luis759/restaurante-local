@@ -1,15 +1,15 @@
 
 <div class="row">
     <div class="col-10 text-center">
-       <h2>Mesas</h2>
+       <h2>Usuarios</h2>
     </div>
     <div class="col-2 text-center ">
     
-    <button type="button" class="btn btn-outline-primary" id="addValue" data-attr="{{ route('mesas-admin-modal',0) }}">Agregar</button>
+    <button type="button" class="btn btn-outline-primary" id="addValue" data-attr="{{ route('usuarios-admin-modal',0) }}">Agregar</button>
     </div>
     <div class="col-12 mt-5">
         <div id="infodata">
-                @include('mesas.tableview')
+                @include('usuarios.tableview')
         </div>
     </div>
 
@@ -37,7 +37,7 @@
                         type:'GET'
                     }).done(function(data){
                         $('#Modal').html(data)
-                        $('#userCrudModal').html('Editar Mesa')
+                        $('#userCrudModal').html('Editar Usuario')
                     });
         });
         $(document).on('click', '#deletevalue', function(event) {
@@ -62,7 +62,7 @@
                         type:'GET'
                     }).done(function(data){
                         $('#Modal').html(data)
-                        $('#userCrudModal').html('Agregar Mesa')
+                        $('#userCrudModal').html('Agregar Usuario')
                     });
         });
         $(document).on('click', '#deletevalue', function(event) {

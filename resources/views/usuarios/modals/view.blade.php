@@ -9,22 +9,22 @@
             </div>
 
             <div class="modal-body">
-            <div class="form-group row">
+                <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Nombre *:</label>
-                <div class="col-sm-8">
-                <input type="text" class="form-control" id="name" placeholder="Nombre" value='{{$dataEdit->name}}'>
+                    <div class="col-sm-8">
+                     <input type="text" class="form-control" id="name" placeholder="Nombre" value='{{$dataEdit->name}}'>
+                    </div>
                 </div>
-            </div>
             <div class="form-group row">
                 <label for="name" class="col-sm-6 col-form-label">Cantidad de Personas *:</label>
                 <div class="col-sm-6">
-                <input type="number" class="form-control" id="cantidad_personas" placeholder="" value='{{$dataEdit->cantidad_personas}}'>
+                    input type="number" class="form-control" id="cantidad_personas" placeholder="" value='{{$dataEdit->cantidad_personas}}'>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Mesa Activa *:</label>
                 <div class="col-sm-8">
-                <input class="form-check-input" type="checkbox" value="" id="active" {{$dataEdit->active?'checked':''}}>
+                    <input class="form-check-input" type="checkbox" value="" id="active" {{$dataEdit->active?'checked':''}}>
                 </div>
             </div>
             <div class="form-group row">
@@ -34,9 +34,9 @@
                 </div>
             </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="botonmodal">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
-        </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="botonmodal">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
+                 </div>
         </div>
    
     </div>
@@ -56,7 +56,7 @@
                 }
                 $.ajax({ 
                     type: "PUT",
-                    url: "{{route('mesas-admin-update',$dataEdit->id)}}", 
+                    url: "{{route('usuarios-admin-update',$dataEdit->id)}}", 
                     data: datas,
                         }).done(function(data){
                             $('#infodata').html(data)
@@ -77,7 +77,7 @@
                 }
                 $.ajax({ 
                     type: "post",
-                    url: "{{route('mesas-admin-add')}}", 
+                    url: "{{route('usuarios-admin-add')}}", 
                     data: datas,
                         }).done(function(data){
                             $('#infodata').html(data)

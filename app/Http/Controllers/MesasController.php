@@ -44,18 +44,18 @@ class MesasController extends Controller
         $input = $request->all();
         $valor =$Mesas->Create($input);
         $todas=Mesas::All();
-        return response()->json(['success'=>true,'data'=>$todas]);
+        return view('mesas.tableview')->with('DataMesas', $todas);
     }
     
     public function actualizar(Request $request, $id){
 
         Mesas::find($id)->update($request->all());
         $todas=Mesas::All();
-        return response()->json(['success'=>true,'data'=>$todas]);
+        return view('mesas.tableview')->with('DataMesas', $todas);
     }
     public function delete($id){
         Mesas::find($id)->delete();
         $todas=Mesas::All();
-        return response()->json(['success'=>true,'data'=>$todas]);
+        return view('mesas.tableview')->with('DataMesas', $todas);
     }
 }

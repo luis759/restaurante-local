@@ -30,7 +30,16 @@ Route::prefix('mesas')->group(function () {
         Route::delete('/admin/{id}', [App\Http\Controllers\MesasController::class, 'delete'])->name('mesas-admin-delete');
     });
 });
-
+Route::prefix('usuarios')->group(function () {
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::get('/admin', [App\Http\Controllers\UsuarioContoller::class, 'index_admin'])->name('usuarios-admin');
+        Route::get('/admin/all', [App\Http\Controllers\UsuarioContoller::class, 'getadminall'])->name('usuarios-admin-all');
+        Route::get('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'showmodal'])->name('usuarios-admin-modal');
+        Route::post('/admin', [App\Http\Controllers\UsuarioContoller::class, 'store'])->name('usuarios-admin-add');
+        Route::put('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'actualizar'])->name('usuarios-admin-update');
+        Route::delete('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'delete'])->name('usuarios-admin-delete');
+    });
+});
 Route::middleware(['auth:mesero'])->group(function () {
 
 });
