@@ -22,7 +22,6 @@ Route::post('/login',  [App\Http\Controllers\Auth\LoginController::class,'authen
 Route::prefix('mesas')->group(function () {
     Route::middleware(['auth:admin'])->group(function () {
         Route::get('/admin', [App\Http\Controllers\MesasController::class, 'index_admin'])->name('mesas-admin');
-        
         Route::get('/admin/all', [App\Http\Controllers\MesasController::class, 'getadminall'])->name('mesas-admin-all');
         Route::get('/admin/{id}', [App\Http\Controllers\MesasController::class, 'showmodal'])->name('mesas-admin-modal');
         Route::post('/admin', [App\Http\Controllers\MesasController::class, 'store'])->name('mesas-admin-add');
@@ -40,9 +39,17 @@ Route::prefix('usuarios')->group(function () {
         Route::delete('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'delete'])->name('usuarios-admin-delete');
     });
 });
-Route::middleware(['auth:mesero'])->group(function () {
-
+Route::prefix('productos')->group(function () {
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::get('/admin', [App\Http\Controllers\UsuarioContoller::class, 'index_admin'])->name('productos-admin');
+        Route::get('/admin/all', [App\Http\Controllers\UsuarioContoller::class, 'getadminall'])->name('productos-admin-all');
+        Route::get('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'showmodal'])->name('productos-admin-modal');
+        Route::post('/admin', [App\Http\Controllers\UsuarioContoller::class, 'store'])->name('productos-admin-add');
+        Route::put('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'actualizar'])->name('productos-admin-update');
+        Route::delete('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'delete'])->name('productos-admin-delete');
+    });
 });
+
 Route::middleware(['auth:admin,mesero'])->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });

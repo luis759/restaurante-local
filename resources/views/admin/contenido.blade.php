@@ -29,6 +29,7 @@
                         <h5 class="card-title">Productos</h5>
                         <p class="card-text" style="height:50px;">Si deseas agregar nuevos productos para la venta en tu local.</p>
                     </div>
+                    <a href="{{ route('productos-admin') }}" class="stretched-link"></a>
             </div>
     </div>
     <div class="col-sm-6 col-12">
