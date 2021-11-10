@@ -1,2 +1,0 @@
-usuario adminrestaurante@restaurante-local.com
-clave ResT@uranteLocal

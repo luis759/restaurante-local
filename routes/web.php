@@ -41,12 +41,12 @@ Route::prefix('usuarios')->group(function () {
 });
 Route::prefix('productos')->group(function () {
     Route::middleware(['auth:admin'])->group(function () {
-        Route::get('/admin', [App\Http\Controllers\UsuarioContoller::class, 'index_admin'])->name('productos-admin');
-        Route::get('/admin/all', [App\Http\Controllers\UsuarioContoller::class, 'getadminall'])->name('productos-admin-all');
-        Route::get('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'showmodal'])->name('productos-admin-modal');
-        Route::post('/admin', [App\Http\Controllers\UsuarioContoller::class, 'store'])->name('productos-admin-add');
-        Route::put('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'actualizar'])->name('productos-admin-update');
-        Route::delete('/admin/{id}', [App\Http\Controllers\UsuarioContoller::class, 'delete'])->name('productos-admin-delete');
+        Route::get('/admin', [App\Http\Controllers\ProductosController::class, 'index_admin'])->name('productos-admin');
+        Route::get('/admin/all', [App\Http\Controllers\ProductosController::class, 'getadminall'])->name('productos-admin-all');
+        Route::get('/admin/{id}', [App\Http\Controllers\ProductosController::class, 'showmodal'])->name('productos-admin-modal');
+        Route::post('/admin', [App\Http\Controllers\ProductosController::class, 'store'])->name('productos-admin-add');
+        Route::put('/admin/{id}', [App\Http\Controllers\ProductosController::class, 'actualizar'])->name('productos-admin-update');
+        Route::delete('/admin/{id}', [App\Http\Controllers\ProductosController::class, 'delete'])->name('productos-admin-delete');
     });
 });
 
