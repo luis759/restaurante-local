@@ -11,7 +11,7 @@
             <div class="modal-body">
             <div class="form-group text-center">
                 <p>Seleccionar Imagen</p>
-                <img id="imagenselec" src="{{asset('assets/img/Productos.png')}}" alt="..." class="img-fluid" style="height:250px;">
+                <img id="imagenselec" src="{{$dataEdit->foto=='blank.png'?asset('assets/img/Productos.png'):(isset($dataEdit->foto)?asset('storage/'.$dataEdit->foto):asset('assets/img/Productos.png'))}}" alt="..." class="img-fluid" style="height:250px;">
                 <input id="image" type="file" name="image" style="display:none;">
             </div>
             <div class="form-group row">
@@ -74,16 +74,23 @@
             @if (isset($dataEdit->id))
             $(document).on('click', '#botonmodal', function(event) {
                 event.preventDefault();
-                var datas =  {
-                    name: $('#name').val(),
-                    cantidad_personas: $('#cantidad_personas').val(),
-                    active: $('#active').is(":checked")?1:0,
-                    orden_active: $('#orden_active').val()
-                }
+                var fds = new FormData();
+                var files = $('#image')[0].files;
+                if(files.length > 0 ){
+                    fds.append('image',files[0])
+                }else{
+                    
+                    }
+                    fds.append('nombre',$('#nombre').val())
+                    fds.append('stock',$('#stock').val())
+                    fds.append('precio',$('#precio').val())
+                    fds.append('descripcion',$('#descripcion').val())
                 $.ajax({ 
                     type: "PUT",
                     url: "{{route('productos-admin-update',$dataEdit->id)}}", 
-                    data: datas,
+                    contentType: false,
+                    processData: false,
+                    data: fds,
                         }).done(function(data){
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
