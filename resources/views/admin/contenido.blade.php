@@ -39,6 +39,7 @@
                         <h5 class="card-title">Ordenes</h5>
                         <p class="card-text" style="height:50px;">Si deseas verificar las ordenes como tambien eliminarlas.</p>
                     </div>
+                    <a href="{{ route('ordenes-admin') }}" class="stretched-link"></a>
             </div>
     </div>
 </div>

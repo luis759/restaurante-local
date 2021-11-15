@@ -15,6 +15,15 @@ class CreateOrdenesTable extends Migration
     {
         Schema::create('ordenes', function (Blueprint $table) {
             $table->id();
+            $table->dateTime('fecha', $precision = 0);
+            $table->float('subtotal', 8, 2);
+            $table->float('total', 8, 2);
+            $table->integer('id_mesa');
+            $table->string('codigo');
+            $table->integer('id_usuario');
+            $table->char('tipodeorden', 1);
+            $table->boolean('pagado');
+            $table->float('propina', 8, 2);
             $table->timestamps();
         });
     }
