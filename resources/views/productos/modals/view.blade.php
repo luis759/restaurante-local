@@ -11,7 +11,7 @@
             <div class="modal-body">
             <div class="form-group text-center">
                 <p>Seleccionar Imagen</p>
-                <img id="imagenselec" src="{{$dataEdit->foto=='blank.png'?asset('assets/img/Productos.png'):(isset($dataEdit->foto)?asset('storage/'.$dataEdit->foto):asset('assets/img/Productos.png'))}}" alt="..." class="img-fluid" style="height:250px;">
+                <img onclick="clickbotonmodalimagen()" id="imagenselec" src="{{$dataEdit->foto=='blank.png'?asset('assets/img/Productos.png'):(isset($dataEdit->foto)?asset('storage/'.$dataEdit->foto):asset('assets/img/Productos.png'))}}" alt="..." class="img-fluid" style="height:250px;">
                 <input id="image" type="file" name="image" style="display:none;">
             </div>
             <div class="form-group row">
@@ -40,7 +40,7 @@
             </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="botonmodal">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
+                <button type="button" class="btn btn-success" id="botonmodal" onclick="clickbotonmodal()">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
         </div>
         </div>
    
@@ -49,9 +49,6 @@
 <script>
 
     $(document).ready( function () { 
-        $(document).on('click', '#imagenselec', function(event) {
-            $('#image').click()
-        })
         $("#image").change(function(){
             var input = this;
             var url = $(this).val();
@@ -71,37 +68,41 @@
         });
 
             $('#modal-id').modal('show');
-            @if (isset($dataEdit->id))
-            $(document).on('click', '#botonmodal', function(event) {
-                event.preventDefault();
-                var fds = new FormData();
-                var files = $('#image')[0].files;
+
+        } );
+        function clickbotonmodalimagen(){
+            $('#image').click()
+        }
+        @if (isset($dataEdit->id))
+            function clickbotonmodal(){
+                 fds = new FormData();
+                 files = $('#image')[0].files;
                 if(files.length > 0 ){
                     fds.append('image',files[0])
                 }else{
-                    
                     }
                     fds.append('nombre',$('#nombre').val())
                     fds.append('stock',$('#stock').val())
                     fds.append('precio',$('#precio').val())
                     fds.append('descripcion',$('#descripcion').val())
+                console.log(fds.get('nombre'))
                 $.ajax({ 
-                    type: "PUT",
+                    type: "post",
                     url: "{{route('productos-admin-update',$dataEdit->id)}}", 
                     contentType: false,
                     processData: false,
                     data: fds,
                         }).done(function(data){
+                            $('#infodata').html('')
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {
                                         paging: true,
                                     });
                         });
-                }); 
+            }
             @else
-            $(document).on('click', '#botonmodal', function(event) {
-                event.preventDefault();
+            function clickbotonmodal(){
                 var fd = new FormData();
                 var files = $('#image')[0].files;
                 if(files.length > 0 ){
@@ -119,14 +120,14 @@
                     processData: false,
                     data: fd,
                         }).done(function(data){
+                            
+                $("#botonmodal").attr("disabled", false);
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {
                                         paging: true,
                                     });
                         });
-                   
-                });
+            }
             @endif
-        } );
 </script>

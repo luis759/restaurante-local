@@ -18,7 +18,7 @@
             <div class="form-group row">
                 <label for="name" class="col-sm-6 col-form-label">Cantidad de Personas *:</label>
                 <div class="col-sm-6">
-                <input type="number" class="form-control" id="cantidad_personas" placeholder="" value='{{$dataEdit->cantidad_personas}}'>
+                <input type="number"  min="0" class="form-control" id="cantidad_personas" placeholder="" value='{{$dataEdit->cantidad_personas}}'>
                 </div>
             </div>
             <div class="form-group row">
@@ -30,7 +30,7 @@
             <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Numero de Orden*:</label>
                 <div class="col-sm-8">
-                <input type="number" class="form-control" id="orden_active" placeholder="" value='{{$dataEdit->orden_active}}'>
+                <input type="number"  min="0" class="form-control" id="orden_active" placeholder="" value='{{$dataEdit->orden_active}}'>
                 </div>
             </div>
             </div>
@@ -48,6 +48,8 @@
             @if (isset($dataEdit->id))
             $(document).on('click', '#botonmodal', function(event) {
                 event.preventDefault();
+                
+                $("#botonmodal").attr("disabled", true);
                 var datas =  {
                     name: $('#name').val(),
                     cantidad_personas: $('#cantidad_personas').val(),
@@ -59,6 +61,8 @@
                     url: "{{route('mesas-admin-update',$dataEdit->id)}}", 
                     data: datas,
                         }).done(function(data){
+                            
+                $("#botonmodal").attr("disabled", false);
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {
@@ -68,6 +72,8 @@
                 }); 
             @else
             $(document).on('click', '#botonmodal', function(event) {
+                
+                $("#botonmodal").attr("disabled", true);
                 event.preventDefault();
                 var datas =  {
                     name: $('#name').val(),
@@ -80,6 +86,8 @@
                     url: "{{route('mesas-admin-add')}}", 
                     data: datas,
                         }).done(function(data){
+                            
+                $("#botonmodal").attr("disabled", false);
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {

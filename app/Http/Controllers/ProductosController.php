@@ -119,6 +119,7 @@ class ProductosController extends Controller
         }else{
 
             $productos=Productos::find($id);
+            
             $input = $request->all();
             if ($request->hasFile('image')) {
                 if ($request->file('image')->isValid()) {
@@ -130,9 +131,10 @@ class ProductosController extends Controller
                     if($productos->foto=='blank.png'){
 
                     }else{
-                        Storage::disk('public_uploads')->delete('/'.$producto->foto);
+                        Storage::disk('public_uploads')->delete($productos->foto);
                     }
 
+                    $guardar='/productos';
                     $ruta = request()->file('image')->store($guardar,'public_uploads');
                     $valorRegistro=[
                         'nombre' => $input['nombre'],
@@ -146,7 +148,6 @@ class ProductosController extends Controller
                 $valorRegistro=[
                     'nombre' => $input['nombre'],
                     'stock' => $input['stock'],
-                    'foto' => $ruta,
                     'descripcion' => $input['descripcion'],
                     'precio'=>$input['precio'],
                 ];
