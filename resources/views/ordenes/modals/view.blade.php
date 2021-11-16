@@ -39,9 +39,9 @@
                     <div class="col-12">
                     <div class="form-group row">
                         <label for="mesero"   class="col-sm-3 col-form-label">Mesero *:</label>
-                        <select class=" selectpicker form-control col-sm-8"  id="mesero" style="width: 70%;">  
+                        <select class=" selectpicker form-control col-sm-8"  id="mesero" style="width: 70%;" value="{{$dataEdit->id_usuario}}">  
                         @foreach ($DataMesero as $DataMesero)
-                        <option value="{{$DataMesero->id}}" >{{$DataMesero->nombre}}</option>
+                        <option value="{{$DataMesero->id}}" {{ $dataEdit->id_usuario== $DataMesero->id  ?'selected="selected"':''}}>{{$DataMesero->nombre}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -55,7 +55,7 @@
                     <div class="col-12 ">
                         <div class="form-group row">
                             <label for="Mesa"   class="col-sm-3 col-form-label">Mesa *:</label>
-                            <select class=" selectpicker form-control col-sm-8"  id="Mesa" style="width: 70%;">  
+                            <select class=" selectpicker form-control col-sm-8"  id="Mesa" style="width: 70%;" value="{{$dataEdit->id_mesa}}">  
                             @foreach ($DataMesa as $DataMesa)
                             <option value="{{$DataMesa->id}}" >{{$DataMesa->nombre}}</option>
                             @endforeach
@@ -126,10 +126,12 @@
     </div>
 </div> 
 <script>
+   
     var produc=[];
     var total=0;
     var subt=0;
     $(document).ready( function () { 
+        retirarData()
         $(".selectpicker").select2({
             templateResult: formatState
         });
@@ -231,15 +233,27 @@ function formatState (opt) {
         return $opt;
     }
 };
+@if (isset($ProductoSelec))
+                function retirarData(){
+                    valor=JSON.parse(' {!! $ProductoSelec !!} ')
+                    produc=valor
+                showDatainfo(produc)
+                gettotal()
+                }
+    @else
 
+    @endif
 @if (isset($dataEdit->id))
             function clickbotonmodal(){
                 var datas =  {
-                    name: $('#name').val(),
-                    cantidad_personas: $('#cantidad_personas').val(),
-                    active: $('#active').is(":checked")?1:0,
-                    orden_active: $('#orden_active').val()00.
-                     
+                    subtotal: subt,
+                    total: total,
+                    id_mesa:$("#Mesa").val(),
+                    id_usuario: $('#mesero').val(),
+                    tipodeorden:$('#delivery').is(":checked")?'D':'L',
+                    propina:$('#propina').val(),
+                    pagado:$('#pagado').is(":checked")?1:0,
+                    productos:JSON.stringify(produc)
                 }
                 $.ajax({ 
                     type: "PUT",
@@ -260,7 +274,7 @@ function formatState (opt) {
                     total: total,
                     id_mesa:$("#Mesa").val(),
                     id_usuario: $('#mesero').val(),
-                    tipodeorden:$('#delivery').is(":checked")?'D':'',
+                    tipodeorden:$('#delivery').is(":checked")?'D':'L',
                     propina:$('#propina').val(),
                     pagado:$('#pagado').is(":checked")?1:0,
                     productos:JSON.stringify(produc)
@@ -270,7 +284,6 @@ function formatState (opt) {
                     url: "{{route('ordenes-admin-add')}}", 
                     data: datas,
                         }).done(function(data){
-                            console.log(data)
                             $('#infodata').html(data)
                             $('#modal-id').modal('hide');
                             $('#table_id').DataTable( {

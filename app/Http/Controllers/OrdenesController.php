@@ -30,7 +30,7 @@ class OrdenesController extends Controller
     }
     public function index_admin()
     {
-        $DataOrdenes = Ordenes::all();
+        $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
         return view('ordenes')
         ->with('DataOrdenes', $DataOrdenes);
     }
@@ -39,6 +39,9 @@ class OrdenesController extends Controller
     {
         $DataProductos= Productos::all();
         $DataUsuarios= User::select('users.id',"users.name as nombre")->where('users.id_nivel','2')->get();
+        $dataProductoSelec= ordenes_productos::select('ordenes_productos.total as total','ordenes_productos.cantidad as valorcantidad','ordenes_productos.precio as valor','ordenes_productos.precio as valor','ordenes_productos.id_orden as valor2',"productos.nombre as nombreproducto")->join('productos','productos.id','=','ordenes_productos.id_productos')->where('ordenes_productos.id_orden', '=', $id)->get();
+    
+
         if($id==0){
             $DataMesas= Mesas::select('id',"name as nombre")->where('active','0')->get();
             $DataOrdenes= New Ordenes;
@@ -46,7 +49,7 @@ class OrdenesController extends Controller
             $DataMesas= Mesas::select('id',"name as nombre")->get();
             $DataOrdenes= Ordenes::find($id);
         }
-        return view('ordenes.modals.view')->with('dataEdit',$DataOrdenes)->with('DataProductos',$DataProductos)->with('DataMesero',$DataUsuarios)->with('DataMesa',$DataMesas);
+        return view('ordenes.modals.view')->with('dataEdit',$DataOrdenes)->with('DataProductos',$DataProductos)->with('DataMesero',$DataUsuarios)->with('DataMesa',$DataMesas)->with('ProductoSelec',$dataProductoSelec);
     }
     public function store(Request $request)
     {
@@ -58,7 +61,8 @@ class OrdenesController extends Controller
             'id_usuario.required' => ' es necesaria seleccionar un Mesero.',
             'productos.required' => ' es necesaria seleccionar un Mesero.',
             'total.min' => ' Debe el total ser mayor a :min.',
-            'subtotal.min' => 'Debes al menos seleccionar un producto.'
+            'subtotal.min' => 'Debes al menos seleccionar un producto.',
+            '*.valorcantidad.min'=> 'La cantidad de productos debe ser mayor a :min'
         ];
         $validator=Validator::make($request->all(), [
             'total' => ['required', 'min:1','numeric'],
@@ -72,12 +76,56 @@ class OrdenesController extends Controller
         if ($validator->fails()) {
             $errors = $validator->errors();
             $DataOrdenes = Ordenes::all();
-        return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
+            return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
         }else{
-            return response()->json([
-                'name' => $request->all(),
-                'state' => 'CA',
-            ]);
+            $Valores=$request->all();
+            $retornoProductos=json_decode($Valores['productos'], true);
+            $validator=Validator::make($retornoProductos, [
+                '*.valorcantidad' => ['required', 'min:1','numeric'],
+                '*.total' => ['required', 'min:1','numeric'],
+                '*.valor2' => ['required', 'exists:App\Models\Productos,id','numeric'],
+                '*.valor' => ['required', 'min:0','numeric'],
+            ],$customMessages);
+
+
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $DataOrdenes = Ordenes::all();
+                return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
+            }else{
+                $mytime =date('Y-m-d H:i:s');
+                $mytime2 =date('YmdHi');
+                
+                $Ordenes = new Ordenes;
+                $valorOrden=[
+                    'fecha' => $mytime,
+                    'subtotal' => $Valores['subtotal'],
+                    'total' => $Valores['total'],
+                    'id_mesa' => $Valores['id_mesa'],
+                    'id_usuario'=>$Valores['id_usuario'],
+                    'tipodeorden'=>$Valores['tipodeorden'],
+                    'propina'=>$Valores['propina'],
+                    'codigo'=>$mytime2.$Valores['id_mesa'].$Valores['id_usuario'],
+                    'pagado'=>$Valores['pagado'],
+                ];
+                $idOrden =$Ordenes->Create($valorOrden)->id;
+                $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
+                $ordenesProductos = new ordenes_productos;
+                foreach ($retornoProductos as $items) {
+                    $valorregistro=[
+                        'id_orden' => $idOrden,
+                        'id_productos' => $items['valor2'],
+                        'cantidad' => $items['valorcantidad'],
+                        'total' => $items['total'],
+                        'precio'=>$items['valor'],
+                    ];
+                    $valor =$ordenesProductos->Create($valorregistro);
+                }
+                $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
+                return view('ordenes.tableview')
+                ->with('DataOrdenes', $DataOrdenes);
+            }
+            
         }
         
         
@@ -88,6 +136,11 @@ class OrdenesController extends Controller
     }
 
     public function delete($id){
+        Ordenes::find($id)->delete();
+        ordenes_productos::where('id_orden', '=', $id)->delete();
+        $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();   
+        return view('ordenes.tableview')
+        ->with('DataOrdenes', $DataOrdenes);
     }
 
 }
