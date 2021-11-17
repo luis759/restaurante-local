@@ -8,6 +8,8 @@
 
                                         @elseif(Auth::guard('mesero')->check())
 
+
+                                        @include('meseros.contenido')
                                         @endif
 </div>
 @endsection
