@@ -51,6 +51,7 @@ class OrdenesController extends Controller
         }
         return view('ordenes.modals.view')->with('dataEdit',$DataOrdenes)->with('DataProductos',$DataProductos)->with('DataMesero',$DataUsuarios)->with('DataMesa',$DataMesas)->with('ProductoSelec',$dataProductoSelec);
     }
+
     public function store(Request $request)
     {
         $customMessages = [
@@ -75,7 +76,7 @@ class OrdenesController extends Controller
 
         if ($validator->fails()) {
             $errors = $validator->errors();
-            $DataOrdenes = Ordenes::all();
+            $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
             return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
         }else{
             $Valores=$request->all();
@@ -90,7 +91,7 @@ class OrdenesController extends Controller
 
             if ($validator->fails()) {
                 $errors = $validator->errors();
-                $DataOrdenes = Ordenes::all();
+                $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
                 return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
             }else{
                 $mytime =date('Y-m-d H:i:s');
@@ -104,12 +105,16 @@ class OrdenesController extends Controller
                     'id_mesa' => $Valores['id_mesa'],
                     'id_usuario'=>$Valores['id_usuario'],
                     'tipodeorden'=>$Valores['tipodeorden'],
-                    'propina'=>$Valores['propina'],
+                    'propina'=>$Valores['propina']?$Valores['propina']:0,
                     'codigo'=>$mytime2.$Valores['id_mesa'].$Valores['id_usuario'],
                     'pagado'=>$Valores['pagado'],
                 ];
                 $idOrden =$Ordenes->Create($valorOrden)->id;
-                $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
+                if($Valores['pagado']){
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
+                }else{
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => false,'orden_active' => null]);
+                }
                 $ordenesProductos = new ordenes_productos;
                 foreach ($retornoProductos as $items) {
                     $valorregistro=[
@@ -132,7 +137,78 @@ class OrdenesController extends Controller
     }
     
     public function actualizar(Request $request, $id){
-       
+        $customMessages = [
+            'total.required' => 'El total es necesario.',
+            'id_mesa.required' => 'La Mesa es necesaria.',
+            'subtotal.required' => 'El Sub Total es necesaria.',
+            'pagado.required' => ' es necesaria seleccionar pagado.',
+            'id_usuario.required' => ' es necesaria seleccionar un Mesero.',
+            'productos.required' => ' es necesaria seleccionar un Mesero.',
+            'total.min' => ' Debe el total ser mayor a :min.',
+            'subtotal.min' => 'Debes al menos seleccionar un producto.',
+            '*.valorcantidad.min'=> 'La cantidad de productos debe ser mayor a :min'
+        ];
+        $validator=Validator::make($request->all(), [
+            'total' => ['required', 'min:1','numeric'],
+            'id_mesa' => ['required', 'string',],
+            'subtotal' => ['required','numeric','min:1'],
+            'pagado' => ['required', 'boolean'],
+            'id_usuario' => ['required', 'string'],
+            'productos' => ['required', 'json'],
+        ],$customMessages);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
+            return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
+        }else{
+            $Valores=$request->all();
+            $retornoProductos=json_decode($Valores['productos'], true);
+            $validator=Validator::make($retornoProductos, [
+                '*.valorcantidad' => ['required', 'min:1','numeric'],
+                '*.total' => ['required', 'min:1','numeric'],
+                '*.valor2' => ['required', 'exists:App\Models\Productos,id','numeric'],
+                '*.valor' => ['required', 'min:0','numeric'],
+            ],$customMessages);
+
+
+            if ($validator->fails()) {
+                $errors = $valiator->errors();
+                $DataOrdenes = Ordenes::dselect('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
+                return view('ordenes.tableview')->with('DataOrdenes', $DataOrdenes)->with('errores',$errors);
+            }else{
+                $valorOrden=[
+                    'subtotal' => $Valores['subtotal'],
+                    'total' => $Valores['total'],
+                    'id_mesa' => $Valores['id_mesa'],
+                    'id_usuario'=>$Valores['id_usuario'],
+                    'tipodeorden'=>$Valores['tipodeorden'],
+                    'propina'=>$Valores['propina']?$Valores['propina']:0,
+                    'pagado'=>$Valores['pagado'],
+                ];
+                Ordenes::find($id)->update($valorOrden);
+                if($Valores['pagado']){
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $id]);
+                }else{
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => false,'orden_active' => null]);
+                }
+                ordenes_productos::where('id_orden', '=', $id)->delete();
+                $ordenesProductos = new ordenes_productos;
+                foreach ($retornoProductos as $items) {
+                    $valorregistro=[
+                        'id_orden' => $id,
+                        'id_productos' => $items['valor2'],
+                        'cantidad' => $items['valorcantidad'],
+                        'total' => $items['total'],
+                        'precio'=>$items['valor'],
+                    ];
+                    $valor =$ordenesProductos->Create($valorregistro);
+                }
+                $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();
+                return view('ordenes.tableview')
+                ->with('DataOrdenes', $DataOrdenes);
+            }
+            
+        }
     }
 
     public function delete($id){
@@ -141,6 +217,25 @@ class OrdenesController extends Controller
         $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();   
         return view('ordenes.tableview')
         ->with('DataOrdenes', $DataOrdenes);
+    }
+    
+    public function pagadoCorrecto($id)
+    {
+        $valorOrden=[
+            'pagado'=>true,
+        ];
+        Ordenes::find($id)->update($valorOrden);
+        $mesasUsadas=Mesas::where('orden_active', '=', $id)->get();
+        $Mesanje="Las Mesas que vienen a continuacion estan liberadas";
+        foreach ($mesasUsadas as $items) {
+            $Mesanje=$Mesanje." ".$items['name']." ,";
+        }
+        $Mesanje=trim($Mesanje, ',');
+        $dataMesas=Mesas::where('orden_active', '=', $id)->update(['active' => false,'orden_active' => null]);
+        return response()->json([
+            'success' => true,
+            'message' => $Mesanje,
+        ]);
     }
 
 }

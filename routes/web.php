@@ -59,6 +59,9 @@ Route::prefix('ordenes')->group(function () {
         Route::put('/admin/{id}', [App\Http\Controllers\OrdenesController::class, 'actualizar'])->name('ordenes-admin-update');
         Route::delete('/admin/{id}', [App\Http\Controllers\OrdenesController::class, 'delete'])->name('ordenes-admin-delete');
     });
+    Route::middleware(['auth:admin,mesero'])->group(function () {
+        Route::get('/admin/pagado/{id}', [App\Http\Controllers\OrdenesController::class, 'pagadoCorrecto'])->name('ordenes-pagado');
+    });
 });
 
 Route::middleware(['auth:admin,mesero'])->group(function () {
