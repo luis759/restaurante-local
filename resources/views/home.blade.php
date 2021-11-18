@@ -7,9 +7,7 @@
                                                 @include('admin.contenido')
 
                                         @elseif(Auth::guard('mesero')->check())
-
-
-                                        @include('meseros.contenido')
+                                                        @include('meseros.contenido')
                                         @endif
 </div>
 @endsection

@@ -64,8 +64,10 @@ Route::prefix('ordenes')->group(function () {
     });
 });
 
-Route::middleware(['auth:admin,mesero'])->group(function () {
+Route::middleware(['auth:admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });
-
+Route::middleware(['auth:mesero'])->group(function () {
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'meserohome'])->name('home');
+});
 
