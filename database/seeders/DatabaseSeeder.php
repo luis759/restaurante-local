@@ -29,5 +29,8 @@ class DatabaseSeeder extends Seeder
         niveldeusuario::create([
             'name' =>'Mesonero',
         ]);
+        niveldeusuario::create([
+            'name' =>'Cajero',
+        ]);
     }
 }

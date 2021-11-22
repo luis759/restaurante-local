@@ -11,6 +11,7 @@
                 <thead>
                     <tr>
                         <th  class="text-center">Foto</th>
+                        <th class="text-center">Carta</th>
                         <th class="text-center">Nombre</th>
                         <th class="text-center">Descripcion</th>
                         <th class="text-center">Stock</th>
@@ -24,6 +25,8 @@
                         <td class="text-center">
                                 <img  src="{{asset('storage/'.$Dataproductos->foto)}}" alt="..." class="img-fluid" style="height:35px;width:35px;">
                         </td>
+                        
+                        <td class="text-center">{{ $Dataproductos->cart }}</td>
                         <td class="text-center">{{ $Dataproductos->nombre }}</td>
                         <td class="text-center">{{ $Dataproductos->descripcion }}</td>
                         <td class="text-center">{{ $Dataproductos->stock }}</td>

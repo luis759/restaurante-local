@@ -44,6 +44,8 @@ class ProductosController extends Controller
     {
         $customMessages = [
             'nombre.required' => 'El nombre es necesario.',
+            'cart.required' => 'El nombre de la carta es necesario.',
+            'productotipo.required' => 'el tipo de producto es necesario.',
             'descripcion.required' => 'La descripcion es necesaria.',
             'stock.required' => 'El stock es necesaria.',
             'precio.required' => 'El precio es necesaria.'
@@ -51,6 +53,8 @@ class ProductosController extends Controller
     
         $validator=Validator::make($request->all(), [
             'nombre' => ['required', 'string', 'max:255'],
+            'cart' => ['required', 'string', 'max:100'],
+            'productotipo' => ['required', 'string', 'max:1'],
             'descripcion' => ['required', 'string'],
             'stock' => ['required', 'integer'],
             'precio' => ['required', 'integer'],
@@ -80,6 +84,8 @@ class ProductosController extends Controller
     
             $valorRegistro=[
                 'nombre' => $input['nombre'],
+                'cart' => $input['cart'],
+                'productotipo' => $input['productotipo'],
                 'stock' => $input['stock'],
                 'foto' => $ruta,
                 'descripcion' => $input['descripcion'],
@@ -98,6 +104,8 @@ class ProductosController extends Controller
     public function actualizar(Request $request, $id){
         $customMessages = [
             'nombre.required' => 'El nombre es necesario.',
+            'cart.required' => 'El nombre de la carta es necesario.',
+            'productotipo.required' => 'el tipo de producto es necesario.',
             'descripcion.required' => 'La descripcion es necesaria.',
             'stock.required' => 'El stock es necesaria.',
             'precio.required' => 'El precio es necesaria.'
@@ -105,10 +113,13 @@ class ProductosController extends Controller
     
         $validator=Validator::make($request->all(), [
             'nombre' => ['required', 'string', 'max:255'],
+            'cart' => ['required', 'string', 'max:100'],
+            'productotipo' => ['required', 'string', 'max:1'],
             'descripcion' => ['required', 'string'],
             'stock' => ['required', 'integer'],
             'precio' => ['required', 'integer'],
         ],$customMessages);
+
 
         if($validator->fails()){
 
@@ -140,6 +151,8 @@ class ProductosController extends Controller
                         'nombre' => $input['nombre'],
                         'stock' => $input['stock'],
                         'foto' => $ruta,
+                        'cart' => $input['cart'],
+                        'productotipo' => $input['productotipo'],
                         'descripcion' => $input['descripcion'],
                         'precio'=>$input['precio'],
                     ];
@@ -149,7 +162,9 @@ class ProductosController extends Controller
                     'nombre' => $input['nombre'],
                     'stock' => $input['stock'],
                     'descripcion' => $input['descripcion'],
-                    'precio'=>$input['precio'],
+                    'precio'=>$input['precio'],   
+                    'cart' => $input['cart'],
+                    'productotipo' => $input['productotipo'],
                 ];
             }
             Productos::find($id)->update($valorRegistro);

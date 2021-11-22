@@ -24,13 +24,13 @@
             <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Mesa Activa *:</label>
                 <div class="col-sm-8">
-                <input class="form-check-input" type="checkbox" value="" id="active" {{$dataEdit->active?'checked':''}}>
+                <input class="form-check-input" type="checkbox" value="" id="active" disabled {{$dataEdit->active?'checked':''}}>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="name" class="col-sm-4 col-form-label">Numero de Orden*:</label>
                 <div class="col-sm-8">
-                <input type="number"  min="0" class="form-control" id="orden_active" placeholder="" value='{{$dataEdit->orden_active}}'>
+                <input type="number"  min="0" class="form-control" id="orden_active" disabled placeholder="" value='{{$dataEdit->orden_active}}'>
                 </div>
             </div>
             </div>

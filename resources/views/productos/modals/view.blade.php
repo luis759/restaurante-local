@@ -15,6 +15,12 @@
                 <input id="image" type="file" name="image" style="display:none;">
             </div>
             <div class="form-group row">
+                <label for="cart" class="col-sm-4 col-form-label">Carta Producto *:</label>
+                <div class="col-sm-8">
+                <input type="text" class="form-control" id="cart" placeholder="" value='{{$dataEdit->cart}}'>
+                </div>
+            </div>
+            <div class="form-group row">
                 <label for="nombre" class="col-sm-4 col-form-label">Nombre Producto *:</label>
                 <div class="col-sm-8">
                 <input type="text" class="form-control" id="nombre" placeholder="" value='{{$dataEdit->nombre}}'>
@@ -23,8 +29,16 @@
             <div class="form-group row">
                 <label for="descripcion" class="col-sm-4 col-form-label">Descripcion Producto *:</label>
                 <div class="col-sm-8">
-                <textarea class="form-control" id="descripcion" rows="3" value='{{$dataEdit->descripcion}}'></textarea>
+                <textarea class="form-control" id="descripcion" rows="3" value='{{$dataEdit->descripcion}}'>{{$dataEdit->descripcion}}</textarea>
                 </div>
+            </div>
+            <div class="form-group row">
+                <label for="productotipo"   class="col-sm-5 col-form-label">Tipo de Producto *:</label>
+                <select class="form-control col-sm-6"  id="productotipo"   value="{{$dataEdit->productotipo}}">
+                <option value="F"  {{$dataEdit->productotipo == 'F'?'selected':''}}>Frio</option>
+                <option value="C"  {{$dataEdit->productotipo == 'C'?'selected':''}}>Caliente</option>
+                <option value="O"  {{$dataEdit->productotipo == 'O'?'selected':''}}>Otros</option>
+                </select>
             </div>
             <div class="form-group row">
                 <label for="stock" class="col-sm-4 col-form-label">Stock *:</label>
@@ -82,6 +96,8 @@
                 }else{
                     }
                     fds.append('nombre',$('#nombre').val())
+                    fds.append('cart',$('#cart').val())
+                    fds.append('productotipo',$('#productotipo').val())
                     fds.append('stock',$('#stock').val())
                     fds.append('precio',$('#precio').val())
                     fds.append('descripcion',$('#descripcion').val())
@@ -111,6 +127,8 @@
                     }
                 fd.append('nombre',$('#nombre').val())
                 fd.append('stock',$('#stock').val())
+                fd.append('cart',$('#cart').val())
+                fd.append('productotipo',$('#productotipo').val())
                 fd.append('precio',$('#precio').val())
                 fd.append('descripcion',$('#descripcion').val())
                 $.ajax({ 

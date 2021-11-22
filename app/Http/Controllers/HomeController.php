@@ -27,7 +27,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        if(Auth::guard('admin')->check()){
+            return view('home');
+
+        }else{
+            return $this->meserohome();
+        }
     }
     public function meserohome()
     {

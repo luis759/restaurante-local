@@ -57,6 +57,8 @@
                                              {{Auth::user()->name}} (Admin)
                                         @elseif(Auth::guard('mesero')->check())
                                             Buenas {{Auth::guard('mesero')->user()->name}} (Mesero)
+                                        @elseif(Auth::guard('cajero')->check())
+                                            Buenas {{Auth::guard('cajero')->user()->name}} (cajero)
                                         @endif
                                 </a>
 

@@ -62,12 +62,12 @@ Route::prefix('ordenes')->group(function () {
     Route::middleware(['auth:admin,mesero'])->group(function () {
         Route::get('/admin/pagado/{id}', [App\Http\Controllers\OrdenesController::class, 'pagadoCorrecto'])->name('ordenes-pagado');
     });
+    Route::middleware(['auth:mesero'])->group(function () {
+        Route::get('/agregarpedidos', [App\Http\Controllers\OrdenesController::class, 'agregarpedidos'])->name('ordenes-agregarpedido');
+    });
 });
 
-Route::middleware(['auth:admin'])->group(function () {
+Route::middleware(['auth:mesero,admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-});
-Route::middleware(['auth:mesero'])->group(function () {
-    Route::get('/', [App\Http\Controllers\HomeController::class, 'meserohome'])->name('home');
 });
 

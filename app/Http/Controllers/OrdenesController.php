@@ -38,8 +38,8 @@ class OrdenesController extends Controller
     public function showmodal($id)
     {
         $DataProductos= Productos::all();
-        $DataUsuarios= User::select('users.id',"users.name as nombre")->where('users.id_nivel','2')->get();
-        $dataProductoSelec= ordenes_productos::select('ordenes_productos.total as total','ordenes_productos.cantidad as valorcantidad','ordenes_productos.precio as valor','ordenes_productos.precio as valor','ordenes_productos.id_orden as valor2',"productos.nombre as nombreproducto")->join('productos','productos.id','=','ordenes_productos.id_productos')->where('ordenes_productos.id_orden', '=', $id)->get();
+        $DataUsuarios= User::select('users.id',"users.name as nombre","id_nivel")->where('users.id_nivel','2')->orWhere('users.id_nivel','3')->get();
+        $dataProductoSelec= ordenes_productos::select('ordenes_productos.total as total','ordenes_productos.cantidad as valorcantidad','ordenes_productos.precio as valor','ordenes_productos.precio as valor','ordenes_productos.id_orden as valor2',"productos.nombre as nombreproducto","ordenes_productos.tipoproducto as tipoproducto")->join('productos','productos.id','=','ordenes_productos.id_productos')->where('ordenes_productos.id_orden', '=', $id)->get();
     
 
         if($id==0){
@@ -111,15 +111,16 @@ class OrdenesController extends Controller
                 ];
                 $idOrden =$Ordenes->Create($valorOrden)->id;
                 if($Valores['pagado']){
-                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
-                }else{
                     $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => false,'orden_active' => null]);
+                }else{
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
                 }
                 $ordenesProductos = new ordenes_productos;
                 foreach ($retornoProductos as $items) {
                     $valorregistro=[
                         'id_orden' => $idOrden,
                         'id_productos' => $items['valor2'],
+                        'tipoproducto'=>$items['tipoproducto'],
                         'cantidad' => $items['valorcantidad'],
                         'total' => $items['total'],
                         'precio'=>$items['valor'],
@@ -187,9 +188,9 @@ class OrdenesController extends Controller
                 ];
                 Ordenes::find($id)->update($valorOrden);
                 if($Valores['pagado']){
-                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $id]);
-                }else{
                     $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => false,'orden_active' => null]);
+                }else{
+                    $DataMesas= Mesas::find($Valores['id_mesa'])->update(['active' => true,'orden_active' => $idOrden]);
                 }
                 ordenes_productos::where('id_orden', '=', $id)->delete();
                 $ordenesProductos = new ordenes_productos;
@@ -198,6 +199,7 @@ class OrdenesController extends Controller
                         'id_orden' => $id,
                         'id_productos' => $items['valor2'],
                         'cantidad' => $items['valorcantidad'],
+                        'tipoproducto'=>$items['tipoproducto'],
                         'total' => $items['total'],
                         'precio'=>$items['valor'],
                     ];

@@ -39,9 +39,9 @@
                     <div class="col-12">
                     <div class="form-group row">
                         <label for="mesero"   class="col-sm-3 col-form-label">Mesero *:</label>
-                        <select class=" selectpicker form-control col-sm-8"  id="mesero" style="width: 70%;" value="{{$dataEdit->id_usuario}}">  
+                        <select  class=" selectpicker form-control col-sm-8"  id="mesero" style="width: 70%;" value="{{$dataEdit->id_usuario}}">  
                         @foreach ($DataMesero as $DataMesero)
-                        <option value="{{$DataMesero->id}}" {{ $dataEdit->id_usuario== $DataMesero->id  ?'selected="selected"':''}}>{{$DataMesero->nombre}}</option>
+                        <option value="{{$DataMesero->id}}" data-attr="{{ $DataMesero->id_nivel==2?10:0}}" {{ $dataEdit->id_usuario== $DataMesero->id  ?'selected="selected"':''}}>{{$DataMesero->nombre}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -70,7 +70,7 @@
                         <select class="selectpicker form-control col-sm-8"  style="width: 70%;" id="productos">  
                         <option value='{"dat":0,"dat1":0}' >Seleccion un Producto</option>
                         @foreach ($DataProductos as $DataProductos)
-                        <option value='{"dat":{{$DataProductos->id}},"dat1":{{$DataProductos->precio}},"dat2":"{{$DataProductos->nombre}}"}' data-image="{{asset('storage/'.$DataProductos->foto)}}" >{{$DataProductos->nombre}}</option>
+                        <option value='{"dat":{{$DataProductos->id}},"dat1":{{$DataProductos->precio}},"dat2":"{{$DataProductos->nombre}}","dat3":"{{$DataProductos->productotipo}}"}' data-image="{{asset('storage/'.$DataProductos->foto)}}" >{{$DataProductos->cart}}</option>
                         @endforeach
                         </select>
                     </div>
@@ -141,7 +141,8 @@
 
         })
         $("#propina").change(function() {
-            gettotal()
+            total=total+($("#propina").val()*1)
+            $('#TotalFacturado').html('Total : '+total+ '  $')
         })
         $("#productos").change(function() {
                  var data=JSON.parse($(this).val());
@@ -154,6 +155,7 @@
                 }
                 $("#cantidad").val('')
                 $("#total").val('')
+                
         });
 
             $('#modal-id').modal('show');
@@ -166,8 +168,10 @@
                 total=total+(produc[i]['total']*1)
             }
             subt=total;
-            total=total+($("#propina").val()*1)
+            var porcentual=$("#mesero option:selected").attr('data-attr')/100
+            $("#propina").val(Math.round(porcentual*total * 100) / 100);
             
+            total=total+($("#propina").val()*1)
             $('#TotalFacturado').html('Total : '+total+ '  $')
         }
      function agregarproductos(){
@@ -177,12 +181,14 @@
                 var valor=productos['dat1']
                 var valor2=productos['dat']
                 var nombreproducto=productos['dat2']
+                var tipoproducto=productos['dat3']
                 var objeto={
                     total:valortotal,
                     valorcantidad:valorcantidad,
                     valor:valor,
                     valor2:valor2,
-                    nombreproducto:nombreproducto
+                    nombreproducto:nombreproducto,
+                    tipoproducto:tipoproducto
                 }
                 produc.push(objeto)
                 $("#cantidad").val('')

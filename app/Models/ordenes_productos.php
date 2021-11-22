@@ -11,6 +11,7 @@ class ordenes_productos extends Model
     protected $table = 'ordenes_productos';
     protected $fillable = [
         'id_orden',
+        'tipoproducto',
         'id_productos',
         'cantidad',
         'total',

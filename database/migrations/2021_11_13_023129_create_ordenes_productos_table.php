@@ -16,6 +16,7 @@ class CreateOrdenesProductosTable extends Migration
         Schema::create('ordenes_productos', function (Blueprint $table) {
             $table->integer('id_orden');
             $table->integer('id_productos');
+            $table->char('tipoproducto', 1);
             $table->integer('cantidad');
             $table->integer('total');
             $table->integer('precio');

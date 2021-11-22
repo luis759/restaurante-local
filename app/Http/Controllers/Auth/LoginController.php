@@ -48,12 +48,15 @@ class LoginController extends Controller
 
         if(Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password,'id_nivel'=>'1'])){
             return redirect()->route('home');
-        }else if (Auth::guard('mesero')->attempt(['email' => $request->email, 'password' => $request->password])) {
+        }else if (Auth::guard('cajero')->attempt(['email' => $request->email, 'password' => $request->password,'id_nivel'=>'3'])) {
+            return redirect()->route('home');
+        }else if (Auth::guard('mesero')->attempt(['email' => $request->email, 'password' => $request->password,'id_nivel'=>'2'])) {
             return redirect()->route('home');
         }
 
+
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'El usuario no existe .',
         ]);
     }
 }

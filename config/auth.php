@@ -49,6 +49,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'cajero' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
 
         'normal' => [
             'driver' => 'session',
