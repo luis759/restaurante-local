@@ -63,7 +63,7 @@ Route::prefix('ordenes')->group(function () {
         Route::get('/admin/pagado/{id}', [App\Http\Controllers\OrdenesController::class, 'pagadoCorrecto'])->name('ordenes-pagado');
     });
     Route::middleware(['auth:mesero'])->group(function () {
-        Route::get('/agregarpedidos', [App\Http\Controllers\OrdenesController::class, 'agregarpedidos'])->name('ordenes-agregarpedido');
+        Route::get('/agregarpedidos/{id}', [App\Http\Controllers\OrdenesController::class, 'agregarpedidos'])->name('ordenes-agregarpedido');
     });
 });
 
