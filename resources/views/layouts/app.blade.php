@@ -85,4 +85,6 @@
         </main>
     </div>
 </body>
+    
+    @yield('footer')
 </html>

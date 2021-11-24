@@ -1,3 +1,20 @@
+<div class="row">
+            <div class="col-12 col-md-8">
+            
+            </div>
+            <div class="col-12 col-md-4">
+                        <div class="list-group h-100" style="max-height: 300px;overflow:auto;-webkit-overflow-scrolling: touch;">
+                                <button type="button" class="list-group-item list-group-item-action">
+                                    Cras justo odio
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action">Dapibus ac facilisis in</button>
+                                <button type="button" class="list-group-item list-group-item-action">Morbi leo risus</button>
+                                <button type="button" class="list-group-item list-group-item-action">Porta ac consectetur ac</button>
+                                <button type="button" class="list-group-item list-group-item-action" disabled>Vestibulum at eros</button>
+                        </div>
+            </div>
+</div>
+
 <script>
 function agregarproductos(){
                 var productos=JSON.parse($("#productos").val());

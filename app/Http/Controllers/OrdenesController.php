@@ -220,10 +220,12 @@ class OrdenesController extends Controller
         return view('ordenes.tableview')
         ->with('DataOrdenes', $DataOrdenes);
     }
+
     public function agregarpedidos($id)
     { 
         return view('meseros.agregarpedido');      
     }
+    
     public function pagadoCorrecto($id)
     {
         $valorOrden=[
