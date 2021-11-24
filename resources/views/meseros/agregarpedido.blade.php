@@ -3,7 +3,9 @@
 @section('content')
 <div class="container">
 @include('meseros.nuevopedido')
+
 </div>
+
 @endsection
 
 @section('footer')

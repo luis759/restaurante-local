@@ -223,7 +223,10 @@ class OrdenesController extends Controller
 
     public function agregarpedidos($id)
     { 
-        return view('meseros.agregarpedido');      
+        
+        $DataProductos= Productos::all();
+        
+        return view('meseros.agregarpedido')->with('DataProductos',$DataProductos);      
     }
     
     public function pagadoCorrecto($id)

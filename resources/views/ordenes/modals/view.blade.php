@@ -94,7 +94,7 @@
                             <div class="form-group row">
                                 <label for="total"   class="col-sm-4 col-form-label">Total :</label>
                                 <div class="col-sm-7">
-                                <input type="number" min="0"  disabled class="form-control" id="total" placeholder="" value=''>
+                                <input type="number" min="0" disabled class="form-control" id="total" placeholder="" value=''>
                                 </div>
                             </div>
                     </div>
