@@ -6,6 +6,7 @@
 
 </div>
 
+@include('resourcestoast.toast')
 @endsection
 
 @section('footer')
@@ -19,7 +20,7 @@
             <p class="m-0">Total:   <span id="totalfooter"></span>$</p>
         </div>
         <div class="col-4">
-        <button type="button" class="btn btn-primary btn-sm btn-block">Agregar Orden</button>
+        <button type="button" class="btn btn-primary btn-sm btn-block" onclick="clickbotonmodal()"> Agregar Orden</button>
         </div>
     </div>
   </div>

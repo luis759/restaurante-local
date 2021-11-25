@@ -33,12 +33,12 @@
                             <div class="form-group row">
                                 <label for="cantidad"   class="col-sm-4 col-form-label">Cantidad :</label>
                                 <div class="col-sm-7">
-                                <input type="number" min="0" class="form-control" data-attr='{"precio":{{$DataProductos->precio}},"id":{{$DataProductos->id}}}'  onchange="valorCambio(this)" id="cantiadprod{{$DataProductos->id}}p" placeholder="" value=''>
+                                <input type="number" min="0" class="form-control" data-attr='{"precio":{{$DataProductos->precio}},"id":{{$DataProductos->id}},"tipoproducto":"{{$DataProductos->productotipo}}"}'  onchange="valorCambio(this)" id="cantiadprod{{$DataProductos->id}}p" placeholder="" value=''>
                                 </div>
                             </div>
                             <label id="total">Total:</label>
                             <svg  id="eliminar" onclick="eliminar(this)" data-attr='{"id":{{$DataProductos->id}},"input":"cantiadprod{{$DataProductos->id}}p"}' width="30" height="30" fill="black" class="bi bi-pencil-square mr-2 float-right" viewBox="0 0 16 16">
-                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
                             </svg> 
                             <svg  id="agregarnuevoproducto" onclick="AGREGAR(this)" data-attr='{"id":{{$DataProductos->id}},"input":"cantiadprod{{$DataProductos->id}}p"}' width="30" height="30" fill="blue" class="bi bi-pencil-square mr-2 float-right" viewBox="0 0 16 16">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
@@ -71,12 +71,14 @@
         let json=JSON.parse(input.attr('data-attr'))
         let precio=json['precio']
         let id=json['id']
+        let tipoproductos=json['tipoproducto']
         let total=(tot*1)*(precio*1)
         var objeto={
             id:id,
             precios:precio,
             subtotal:total,
-            cantidad:tot
+            cantidad:tot,
+            tipoproducto:tipoproductos
         }
         produc.push(objeto)
         $(valor).attr('onclick','')
@@ -88,11 +90,10 @@
         getTotal()
     }
     function eliminar(valor){
-        
         let data=JSON.parse($(valor).attr('data-attr'))
         let input=$("#"+data['input'])
         let json=input.attr('data-attr')
-        let id=json['id']
+        let id=data['id']
         let lugar=0
        for(var i=0;i<produc.length;i++){
            if(produc[i]['id']==id){
@@ -112,14 +113,43 @@
         produc.splice(lugar,1)
         getTotal()
     }
+    function clickbotonmodal(){
+        $.ajaxSetup({
+            headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+        });
+                var datas =  {
+                    subtotal: $('#sutotalfooter').html()*1,
+                    total: $('#totalfooter').html()*1,
+                    propina:$('#propinafooter').html()*1,
+                    productos:JSON.stringify(produc)
+                }
+                console.log(datas)
+                $.ajax({ 
+                    type: "POST",
+                    url: "{{route('ordenes-agregarpedido-mesa',$idmesa)}}", 
+                    data: datas,
+                        }).done(function(data){
+                            if(data['success']){
+                                window.location.href="{{route('home')}}"
+                            }else{
+                            $('#toastMessage').html(data['data'])
+                            $('.toast').toast("show")
+                            }
+                        });
+            }
 
    function getTotal(){
        let sas=0
        for(let k=0;k<produc.length;k++){
         sas=sas+(produc[k]['subtotal']*1)
        }
-       $('#sutotalfooter').html(sas)
-       $('#propinafooter').html(sas*0.10)
-       $('#totalfooter').html(sas+(sas*0.10))
+       let subtotal=Math.round( sas * 100) / 100
+       let propina=Math.round( (subtotal*0.10 )* 100) / 100
+       let totales=subtotal+propina
+       $('#sutotalfooter').html(subtotal)
+       $('#propinafooter').html(propina)
+       $('#totalfooter').html(totales)
     }
 </script>
