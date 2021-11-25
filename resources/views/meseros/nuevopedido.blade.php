@@ -37,9 +37,13 @@
                                 </div>
                             </div>
                             <label id="total">Total:</label>
-                            <svg  id="agregarnuevoproducto" onclick="AGREGAR(this)" data-attr='{"id":{{$DataProductos->id}},"input":"cantiadprod{{$DataProductos->id}}p","total":"total{{$DataProductos->id}}p"}' width="30" height="30" fill="blue" class="bi bi-pencil-square mr-2 float-right" viewBox="0 0 16 16">
+                            <svg  id="eliminar" onclick="eliminar(this)" data-attr='{"id":{{$DataProductos->id}},"input":"cantiadprod{{$DataProductos->id}}p"}' width="30" height="30" fill="black" class="bi bi-pencil-square mr-2 float-right" viewBox="0 0 16 16">
                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
                             </svg> 
+                            <svg  id="agregarnuevoproducto" onclick="AGREGAR(this)" data-attr='{"id":{{$DataProductos->id}},"input":"cantiadprod{{$DataProductos->id}}p"}' width="30" height="30" fill="blue" class="bi bi-pencil-square mr-2 float-right" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v3h-3a.5.5 0 0 0 0 1h3v3a.5.5 0 0 0 1 0v-3h3a.5.5 0 0 0 0-1h-3v-3z"/>
+                            </svg> 
+                            
                         </div>
                     </div>
                     </div>
@@ -52,39 +56,70 @@
 </div>
 
 <script>
+    var produc=[]
     function valorCambio(valor){
         let total =$(valor).val();
         let json=JSON.parse($(valor).attr('data-attr'))
         let precio=json['precio']
         let id=json['id']
-        $(valor).parent().parent().children( "#total" ).html("Total:  "+(total*1)*(precio*1))
+        $(valor).parent().parent().parent().children( "#total" ).html("Total:  "+(total*1)*(precio*1))
     }
     function AGREGAR(valor){
         let data=JSON.parse($(valor).attr('data-attr'))
-        console.log(data)
+        let input=$("#"+data['input'])
+        let tot=$("#"+data['input']).val()
+        let json=JSON.parse(input.attr('data-attr'))
+        let precio=json['precio']
+        let id=json['id']
+        let total=(tot*1)*(precio*1)
+        var objeto={
+            id:id,
+            precios:precio,
+            subtotal:total,
+            cantidad:tot
+        }
+        produc.push(objeto)
+        $(valor).attr('onclick','')
+        $(valor).attr('fill','black')
+        input.prop('disabled', true)
+        $(valor).parent().children( "#eliminar" ).attr('onclick','eliminar(this)')
+        $(valor).parent().children( "#eliminar" ).attr('fill','blue')
+        $(valor).parent().parent().parent().parent().parent().children('.accordion-header').children('.accordion-button').addClass('borderacordionactive')
+        getTotal()
     }
-function agregarproductos(){
-                var productos=JSON.parse($("#productos").val());
-                var valortotal=$("#total").val()
-                var valorcantidad=$("#cantidad").val()
-                var valor=productos['dat1']
-                var valor2=productos['dat']
-                var nombreproducto=productos['dat2']
-                var tipoproducto=productos['dat3']
-                var objeto={
-                    total:valortotal,
-                    valorcantidad:valorcantidad,
-                    valor:valor,
-                    valor2:valor2,
-                    nombreproducto:nombreproducto,
-                    tipoproducto:tipoproducto
-                }
-                produc.push(objeto)
-                $("#cantidad").val('')
-                $("#total").val('')
-                $("#dataproductosagre").css( "display","none" );
-                $("#productos").val('{"dat":0,"dat1":0}').change()
-                showDatainfo(produc)
-                gettotal()
-     }
+    function eliminar(valor){
+        
+        let data=JSON.parse($(valor).attr('data-attr'))
+        let input=$("#"+data['input'])
+        let json=input.attr('data-attr')
+        let id=json['id']
+        let lugar=0
+       for(var i=0;i<produc.length;i++){
+           if(produc[i]['id']==id){
+             $(valor).attr('onclick','')
+             $(valor).attr('fill','black')
+             input.prop('disabled', false)
+             input.val('')
+             lugar=i
+             $(valor).parent().children( "#agregarnuevoproducto" ).attr('onclick','AGREGAR(this)')
+             $(valor).parent().children( "#agregarnuevoproducto" ).attr('fill','blue')
+             $(valor).parent().parent().parent().parent().parent().children('.accordion-header').children('.accordion-button').removeClass('borderacordionactive')
+ 
+             $(valor).parent().children( "#total" ).html("Total:  ")
+           }
+       }
+       
+        produc.splice(lugar,1)
+        getTotal()
+    }
+
+   function getTotal(){
+       let sas=0
+       for(let k=0;k<produc.length;k++){
+        sas=sas+(produc[k]['subtotal']*1)
+       }
+       $('#sutotalfooter').html(sas)
+       $('#propinafooter').html(sas*0.10)
+       $('#totalfooter').html(sas+(sas*0.10))
+    }
 </script>
