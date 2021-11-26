@@ -29,7 +29,7 @@
                         <div class="col-12 col-md-8 d-flex  flex-wrap text-break">
                         Descripcion:  {{$DataProductos->descripcion}} 
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div id="form" class="col-12 col-md-4">
                             <div class="form-group row">
                                 <label for="cantidad"   class="col-sm-4 col-form-label">Cantidad :</label>
                                 <div class="col-sm-7">
@@ -50,7 +50,7 @@
                 </div>
                 </div>
                 
-            @endforeach
+        @endforeach
                 </div>
             </div>
 </div>
@@ -113,7 +113,28 @@
         produc.splice(lugar,1)
         getTotal()
     }
-    function clickbotonmodal(){
+        
+    @if(isset($dataOrdenes))
+    $(document).ready( function () {
+        valoresCambiosAutomaticos()
+    })
+    function valoresCambiosAutomaticos(){
+                produc=JSON.parse(' {!! $dataProductoSelec !!} ')
+                for(var  i = 0; i < produc.length; i++){
+                    let objeto=$('#flush-collapseOne'+produc[i]['id'])
+                    objeto.children('.accordion-body').children('.row').children('#form').children('#agregarnuevoproducto').attr('onclick','')
+                    objeto.children('.accordion-body').children('.row').children('#form').children('#agregarnuevoproducto').attr('fill','black')
+                    $('#cantiadprod'+produc[i]['id']+'p').val(produc[i]['cantidad'])
+                    $('#cantiadprod'+produc[i]['id']+'p').prop('disabled', true)
+                    $('#cantiadprod'+produc[i]['id']+'p').parent().parent().parent().children( "#total" ).html("Total:  "+produc[i]['subtotal'])
+                    objeto.children('.accordion-body').children('.row').children('#form').children( "#eliminar" ).attr('onclick','eliminar(this)')
+                    objeto.children('.accordion-body').children('.row').children('#form').children( "#eliminar" ).attr('fill','blue')
+                    objeto.parent().children('.accordion-header').children('.accordion-button').addClass('borderacordionactive') 
+                    getTotal()
+                }
+            }
+
+    function clickEditar(){
         $.ajaxSetup({
             headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -125,7 +146,32 @@
                     propina:$('#propinafooter').html()*1,
                     productos:JSON.stringify(produc)
                 }
-                console.log(datas)
+                $.ajax({ 
+                    type: "PUT",
+                    url: "{{route('ordenes-editarpedido-idorden',$dataOrdenes->id)}}", 
+                    data: datas,
+                        }).done(function(data){
+                            if(data['success']){
+                                window.location.href="{{route('home')}}"
+                            }else{
+                            $('#toastMessage').html(data['data'])
+                            $('.toast').toast("show")
+                            }
+                        });
+    }        
+     @else
+     function clickbotonmodal(){
+        $.ajaxSetup({
+            headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+        });
+                var datas =  {
+                    subtotal: $('#sutotalfooter').html()*1,
+                    total: $('#totalfooter').html()*1,
+                    propina:$('#propinafooter').html()*1,
+                    productos:JSON.stringify(produc)
+                }
                 $.ajax({ 
                     type: "POST",
                     url: "{{route('ordenes-agregarpedido-mesa',$idmesa)}}", 
@@ -138,8 +184,8 @@
                             $('.toast').toast("show")
                             }
                         });
-            }
-
+        }       
+    @endif
    function getTotal(){
        let sas=0
        for(let k=0;k<produc.length;k++){

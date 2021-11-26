@@ -7,7 +7,7 @@
                 <div class="card-body">
                 <ul class="list-group h-100 align-self-center" style="max-height: 300px;overflow:auto;-webkit-overflow-scrolling: touch;">
                     @foreach ($dataOrdenesSelect as $dataOrdenesSelects)
-                                    <li class="list-group-item "  onclick="seleccionorden(this)" data-attr="{{route('ordenes-get-produc',$dataOrdenesSelects->id)}}">
+                                    <li class="list-group-item "  onclick="seleccionorden(this)" data-attr="{{route('ordenes-get-produc',$dataOrdenesSelects->id)}}" data-id="{{$dataOrdenesSelects->id}}">
                                             <div class="row m-0 p-0">
                                                 <div class="col-3">
                                                 <svg width="50" height="50" fill="green" class="bi bi-credit-card-fill mb-4"  viewBox="0 0 26 26">
@@ -86,7 +86,7 @@
                         type:'GET'
                     }).done(function(data){
                          let valorRetorno = data
-                         if(valorRetorno['success']){e
+                         if(valorRetorno['success']){
                             $('#mesaslibres').html(valorRetorno['mesaslibre'])
                             $('#productosCard').html('')
                             documenotClear.remove()
@@ -100,14 +100,22 @@
         });
         function seleccionorden(orden){
             let valor=$(orden).attr('data-attr')
+            let valorid = '{{ route('ordenes-editarpedidos') }}'+'/'+$(orden).attr('data-id');
             $.ajax({
                         url: valor,
                         type:'GET'
                     }).done(function(data){
+                            $('#editValue').attr('fill','blue')
+                            $('#editValue').attr('data-attr',valorid)
+                            $('#editValue').attr('onclick','irabuscar(this)')
                             $('#productosCard').html(data)
                     });
         }
         function pagar(ir){
             window.location.href=ir
+        }
+        function irabuscar(valor){
+            let buscar=$(valor).attr('data-attr')
+            window.location.href=buscar
         }
 </script>

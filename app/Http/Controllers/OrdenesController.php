@@ -306,6 +306,84 @@ class OrdenesController extends Controller
             }
         }
     }
+
+    public function edipedidomesero(Request $request, $id){
+        $customMessages = [
+            'total.required' => 'El total es necesario.',
+            'subtotal.required' => 'El Sub Total es necesaria.',
+            'propina.required' => ' La propina es necesaria.',
+            'productos.required' => ' es necesaria seleccionar un Producto.',
+            'total.min' => ' Debe el total ser mayor a :min.',
+            'subtotal.min' => 'Debes al menos seleccionar un producto.',
+            '*.cantidad.min'=> 'La cantidad de productos debe ser mayor a :min'
+        ];
+        $validator=Validator::make($request->all(), [
+            'total' => ['required', 'min:1','numeric'],
+            'subtotal' => ['required','numeric','min:1'],
+            'productos' => ['required', 'json'],
+        ],$customMessages);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $texto='<div class="alert alert-danger"><ul>';
+            foreach($errors->all() as  $errorss){
+               $texto=$texto.'<li>'.$errorss .'</li>';
+            }
+            $texto=$texto."</ul></div>";
+            return response()->json([
+                'success' => false,
+                'data' => $texto,
+            ]);
+        }else{
+            $Valores=$request->all();
+            $retornoProductos=json_decode($Valores['productos'], true);
+            $validator=Validator::make($retornoProductos, [
+                '*.cantidad' => ['required', 'min:1','numeric'],
+                '*.precios' => ['required', 'min:1','numeric'],
+                '*.id' => ['required', 'exists:App\Models\Productos,id','numeric'],
+                '*.subtotal' => ['required', 'min:0','numeric'],
+            ],$customMessages);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $texto='<div class="alert alert-danger"><ul>';
+                foreach($errors->all() as  $errorss){
+                   $texto=$texto.'<li>'.$errorss .'</li>';
+                }
+                $texto=$texto."</ul></div>";
+                return response()->json([
+                    'success' => false,
+                    'data' => $texto,
+                ]);
+            }else{
+                $Ordenes = new Ordenes;
+                $valorOrden=[
+                    'subtotal' => $Valores['subtotal'],
+                    'total' => $Valores['total'],
+                    'propina'=>$Valores['propina']?$Valores['propina']:0,
+                    'pagado'=>false,
+                ];
+                Ordenes::find($id)->update($valorOrden); 
+                ordenes_productos::where('id_orden', '=', $id)->delete();
+                $ordenesProductos = new ordenes_productos;
+                foreach ($retornoProductos as $items) {
+                    $valorregistro=[
+                        'id_orden' => $id,
+                        'id_productos' => $items['id'],
+                        'tipoproducto'=>$items['tipoproducto'],
+                        'cantidad' => $items['cantidad'],
+                        'total' => $items['subtotal'],
+                        'precio'=>$items['precios'],
+                    ];
+                    $valor =$ordenesProductos->Create($valorregistro);
+                }
+                return response()->json([
+                    'success' => true,
+                    'data' => 'pedidoactualizado ',
+                ]);
+            }
+        }
+    }
+
     public function productosorden($id)
     {
         $DataProductos= Productos::select('productos.nombre','productos.foto','productos.cart','ordenes_productos.cantidad')->join('ordenes_productos','ordenes_productos.id_productos','=','productos.id')->where('ordenes_productos.id_orden',$id)->get();
@@ -319,7 +397,16 @@ class OrdenesController extends Controller
         
         return view('meseros.agregarpedido')->with('DataProductos',$DataProductos)->with('idmesa',$id);      
     }
-    
+    public function agregarpedidosedit($id)
+    { 
+        $dataEdit="";
+        $DataProductos= Productos::all();
+        
+        $dataProductosSelect= Ordenes_Productos::SELECT('id_productos as id','precio as precios','total as subtotal','cantidad','tipoproducto')->where('id_orden','=',$id)->get();
+        $dataOrdenes= Ordenes::find($id);
+        $idmesa=$dataOrdenes->id;
+        return view('meseros.agregarpedido')->with('DataProductos',$DataProductos)->with('idmesa',$idmesa)->with('dataOrdenes',$dataOrdenes)->with('dataProductoSelec',$dataProductosSelect);      
+    }
     public function pagadoCorrecto($id)
     {
         $valorOrden=[

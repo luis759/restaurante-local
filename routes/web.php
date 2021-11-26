@@ -64,8 +64,10 @@ Route::prefix('ordenes')->group(function () {
     });
     Route::middleware(['auth:mesero'])->group(function () {
         Route::get('/agregarpedidos/{id}', [App\Http\Controllers\OrdenesController::class, 'agregarpedidos'])->name('ordenes-agregarpedido');
+        Route::get('/editarpedidos/{id?}', [App\Http\Controllers\OrdenesController::class, 'agregarpedidosedit'])->name('ordenes-editarpedidos');
         Route::get('/getpproduc/{id}', [App\Http\Controllers\OrdenesController::class, 'productosorden'])->name('ordenes-get-produc');
         Route::post('/addpedido/{id}', [App\Http\Controllers\OrdenesController::class, 'storepedidomesero'])->name('ordenes-agregarpedido-mesa');
+        Route::put('/editpedido/{id}', [App\Http\Controllers\OrdenesController::class, 'edipedidomesero'])->name('ordenes-editarpedido-idorden');
     });
 });
 

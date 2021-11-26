@@ -20,7 +20,13 @@
             <p class="m-0">Total:   <span id="totalfooter"></span>$</p>
         </div>
         <div class="col-4">
+        @if(isset($dataOrdenes))
+
+        <button type="button" class="btn btn-primary btn-sm btn-block" onclick="clickEditar()"> Editar Orden</button>
+
+        @else
         <button type="button" class="btn btn-primary btn-sm btn-block" onclick="clickbotonmodal()"> Agregar Orden</button>
+        @endif
         </div>
     </div>
   </div>
