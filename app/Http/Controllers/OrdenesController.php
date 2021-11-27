@@ -9,7 +9,8 @@ use App\Models\Mesas;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Ordenes_productos;
-
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
+use Mike42\Escpos\Printer;
 use Illuminate\Support\Facades\Validator;
 
 class OrdenesController extends Controller
@@ -299,6 +300,7 @@ class OrdenesController extends Controller
                     ];
                     $valor =$ordenesProductos->Create($valorregistro);
                 }
+                $this->immprimirCaliente();
                 return response()->json([
                     'success' => true,
                     'data' => 'pedidoReakuzado ',
@@ -427,6 +429,32 @@ class OrdenesController extends Controller
             'message' => $Mesanje,
             'mesaslibre'=>view('meseros.sides.mesasactiva')->with('dataMesasLibres',$MesasLibres)->render()
         ]);
+    }
+    private function immprimirCaliente($id_orden){
+        $impresoramon=env('IMPRESORA_COCINA', 'IMPRESORA_COCINA');
+        $dataDelaOrden=Ordenes::find($id_orden);
+        $dataDelaOrden=Ordenes_Productos::SELECT('ordenes_productos.cantidad','ordenes_productos.total','ordenes_productos.precio','productos.nombre')->join('productos','productos.id','=','ordenes_productos.id_productos')->where('ordenes_productos.id_orden','=',$id_orden)->where('ordenes_productos.tipoproducto','=','F');
+        $connector = new WindowsPrintConnector($impresoramon);
+        $impresora = new Printer($connector);
+        $impresora->setJustification(Printer::JUSTIFY_CENTER);
+        $impresora->setTextSize(2, 2);
+        $impresora->text("CUENTA");
+        $impresora->text("\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora->setTextSize(1, 1);
+        $impresora->text("COMANDA: ");
+        $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+        $impresora->text("MESA: ");
+        $impresora->text("\n");
+        $impresora->setJustification(Printer::JUSTIFY_CENTER);
+        $impresora->text("FECHA");
+        $impresora->text("\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora->text("GARZON: ");
+        $impresora->text("PRUEBA");
+        $impresora->text("\n");
+        $impresora->feed(4);
+        $impresora->close();
     }
 
 }
