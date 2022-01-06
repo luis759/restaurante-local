@@ -12,6 +12,7 @@ use App\Models\Ordenes_productos;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 use Mike42\Escpos\Printer;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class OrdenesController extends Controller
 {
@@ -300,10 +301,10 @@ class OrdenesController extends Controller
                     ];
                     $valor =$ordenesProductos->Create($valorregistro);
                 }
-                $this->immprimirCaliente();
+              $this->imprimirOrdens($idOrden);
                 return response()->json([
                     'success' => true,
-                    'data' => 'pedidoReakuzado ',
+                    'data' => $valor,
                 ]);
             }
         }
@@ -378,6 +379,8 @@ class OrdenesController extends Controller
                     ];
                     $valor =$ordenesProductos->Create($valorregistro);
                 }
+                
+              $this->imprimirOrdens($id);
                 return response()->json([
                     'success' => true,
                     'data' => 'pedidoactualizado ',
@@ -430,31 +433,136 @@ class OrdenesController extends Controller
             'mesaslibre'=>view('meseros.sides.mesasactiva')->with('dataMesasLibres',$MesasLibres)->render()
         ]);
     }
+    private function imprimirOrdens($id_orden){
+        
+        $this->immprimirCaliente($id_orden);
+        $this->imprimirfrio($id_orden);
+    }
     private function immprimirCaliente($id_orden){
-        $impresoramon=env('IMPRESORA_COCINA', 'IMPRESORA_COCINA');
-        $dataDelaOrden=Ordenes::find($id_orden);
-        $dataDelaOrden=Ordenes_Productos::SELECT('ordenes_productos.cantidad','ordenes_productos.total','ordenes_productos.precio','productos.nombre')->join('productos','productos.id','=','ordenes_productos.id_productos')->where('ordenes_productos.id_orden','=',$id_orden)->where('ordenes_productos.tipoproducto','=','F');
+        try {
+           
+        $CalientesImpresion=Ordenes::SELECT('ordenes.codigo','ordenes.fecha','mesas.name','users.name as nombreGarzon')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->join('ordenes_productos', 'ordenes_productos.id_orden', '=', 'ordenes.id')->where('ordenes.id', '=', $id_orden)->where('ordenes_productos.tipoproducto', '=', 'C')->distinct()->get();
+        if ($CalientesImpresion->count()) {
+        $productos=Ordenes_productos::SELECT('productos.nombre','productos.cart','ordenes_productos.cantidad')->join('productos','ordenes_productos.id_productos','=','productos.id')->where('ordenes_productos.id_orden','=',$id_orden)->where('ordenes_productos.tipoproducto', '=', 'C')->distinct()->get();
+        $impresoramon=env('IMPRESORA_CALIENTE', 'IMPRESORA_CALIENTE');
+        $connector = new WindowsPrintConnector($impresoramon);
+        $impresora = new Printer($connector);
+        $impresora->setJustification(Printer::JUSTIFY_CENTER);
+        $impresora -> text("PRODUCTOS CALIENTE \n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $line = sprintf('%-12s %12s','COMANDA: '.$CalientesImpresion[0]->codigo , 'MESA: '.$CalientesImpresion[0]->name);
+        $impresora -> text("$line\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("FECHA: ".date('Y-m-d',strtotime($CalientesImpresion[0]->fecha))."\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $line = sprintf('%-30s','GARZON: '.$CalientesImpresion[0]->nombreGarzon."\n");
+        $impresora -> text("$line\n");
+        $impresora->setJustification(Printer::JUSTIFY_CENTER);
+        $impresora -> text("PRODUCTOS \n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $line = sprintf('%6.70s - %6.70s - %3s' , 'CART', 'NOMBRE','CANTIDAD');
+        $impresora -> text("$line\n");
+        foreach($productos as $productosImpresion){
+            $line = sprintf('%6.70s - %6.70s - %3.0f ' , $productosImpresion->cart, $productosImpresion->nombre,$productosImpresion->cantidad);
+            $impresora -> text("$line\n");
+        }
+        $impresora->cut();
+        $impresora->close();
+        }
+        } catch (Exception $e) {
+            Log::error($e -> getMessage());
+        }
+       
+    }
+    private function imprimirfrio($id_orden){
+        try {
+            $CalientesImpresion=Ordenes::SELECT('ordenes.codigo','ordenes.fecha','mesas.name','users.name as nombreGarzon')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->join('ordenes_productos', 'ordenes_productos.id_orden', '=', 'ordenes.id')->where('ordenes.id', '=', $id_orden)->where('ordenes_productos.tipoproducto', '=', 'F')->distinct()->get();
+
+            if ($CalientesImpresion->count()) {
+            $productos=Ordenes_productos::SELECT('productos.nombre','productos.cart','ordenes_productos.cantidad')->join('productos','ordenes_productos.id_productos','=','productos.id')->where('ordenes_productos.id_orden','=',$id_orden)->where('ordenes_productos.tipoproducto', '=', 'F')->distinct()->get();
+    
+            $impresoramon=env('IMPRESORA_FRIO', 'IMPRESORA_FRIO');
+            $connector = new WindowsPrintConnector($impresoramon);
+            $impresora = new Printer($connector);
+            $impresora->setJustification(Printer::JUSTIFY_CENTER);
+            $impresora -> text("PRODUCTOS FRIO \n");
+            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            $line = sprintf('%-12s %12s','COMANDA: '.$CalientesImpresion[0]->codigo , 'MESA: '.$CalientesImpresion[0]->name);
+            $impresora -> text("$line\n");
+            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            $impresora -> text("FECHA: ".date('Y-m-d',strtotime($CalientesImpresion[0]->fecha))."\n");
+            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            $line = sprintf('%-30s','GARZON: '.$CalientesImpresion[0]->nombreGarzon."\n");
+            $impresora -> text("$line\n");
+            $impresora->setJustification(Printer::JUSTIFY_CENTER);
+            $impresora -> text("PRODUCTOS \n");
+            $impresora->setJustification(Printer::JUSTIFY_LEFT);
+            $line = sprintf('%6.70s - %6.70s - %3s' , 'CART', 'NOMBRE','CANTIDAD');
+            $impresora -> text("$line\n");
+            foreach($productos as $productosImpresion){
+                $line = sprintf('%6.70s - %6.70s - %3.0f ' , $productosImpresion->cart, $productosImpresion->nombre,$productosImpresion->cantidad);
+                $impresora -> text("$line\n");
+            }
+            $impresora->cut();
+            $impresora->close();
+            }
+        } catch (Exception $e) {
+            Log::error($e -> getMessage());
+        }
+    
+
+        
+
+    }
+    private function imprimirboleta($id_orden){
+        try {
+            $CalientesImpresion=Ordenes::SELECT('ordenes.codigo','ordenes.total','ordenes.propina','ordenes.fecha','ordenes.subtotal','mesas.name','users.name as nombreGarzon')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->join('ordenes_productos', 'ordenes_productos.id_orden', '=', 'ordenes.id')->where('ordenes.id', '=', $id_orden)->distinct()->get();
+        if ($CalientesImpresion->count()) {
+        $productos=Ordenes_productos::SELECT('productos.nombre','productos.cart','productos.precio','ordenes_productos.cantidad','ordenes_productos.total')->join('productos','ordenes_productos.id_productos','=','productos.id')->where('ordenes_productos.id_orden','=',$id_orden)->distinct()->get();
+        $impresoramon=env('IMPRESORA_BOLETA', 'IMPRESORA_BOLETA');
         $connector = new WindowsPrintConnector($impresoramon);
         $impresora = new Printer($connector);
         $impresora->setJustification(Printer::JUSTIFY_CENTER);
         $impresora->setTextSize(2, 2);
-        $impresora->text("CUENTA");
-        $impresora->text("\n");
-        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("CUENTA \n");
         $impresora->setTextSize(1, 1);
-        $impresora->text("COMANDA: ");
-        $impresora->setJustification(Printer::JUSTIFY_RIGHT);
-        $impresora->text("MESA: ");
-        $impresora->text("\n");
-        $impresora->setJustification(Printer::JUSTIFY_CENTER);
-        $impresora->text("FECHA");
-        $impresora->text("\n");
+        $impresora -> text("YAKUZA SUSHI BAR DELIVERY \n");
         $impresora->setJustification(Printer::JUSTIFY_LEFT);
-        $impresora->text("GARZON: ");
-        $impresora->text("PRUEBA");
-        $impresora->text("\n");
-        $impresora->feed(4);
+        $line = sprintf('%-12s %12s','COMANDA: '.$CalientesImpresion[0]->codigo , 'MESA: '.$CalientesImpresion[0]->name);
+        $impresora -> text("$line\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("FECHA: ".date('Y-m-d',strtotime($CalientesImpresion[0]->fecha))."\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $line = sprintf('%-30s','GARZON: '.$CalientesImpresion[0]->nombreGarzon."\n");
+        $impresora -> text("$line\n");
+        $impresora->setJustification(Printer::JUSTIFY_CENTER);
+        $impresora -> text("PRODUCTOS \n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $line = sprintf('%3.0s - %7.70s - %3.2f - %3.2f' , 'CT', 'NOMBRE','$','SUBT');
+        $impresora -> text("$line\n");
+        foreach($productos as $productosImpresion){
+            $line = sprintf('%3.0s - %7.70s - %3.2f - %3.2f' , $productosImpresion->cantidad, $productosImpresion->nombre,$productosImpresion->precio,$productosImpresion->total);
+            $impresora -> text("$line\n");
+        }
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("SUB TOTAL: \n");
+        $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+        $impresora->text("$ ".$CalientesImpresion[0]->subtotal."\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("SE SUGIERE EL 10 % DE PROPINA  \n");
+        $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+        $impresora->text("$ ".$CalientesImpresion[0]->propina."\n");
+        $impresora->setJustification(Printer::JUSTIFY_LEFT);
+        $impresora -> text("TOTAL: \n");
+        $impresora->setJustification(Printer::JUSTIFY_RIGHT);
+        $impresora->text("$ ".$CalientesImpresion[0]->total."\n");
+        $impresora->cut();
         $impresora->close();
-    }
+        }
+        } catch (Exception $e) {
+            Log::error($e -> getMessage());
+        }
+       
 
+    }
 }
