@@ -15,6 +15,7 @@ class Ordenes extends Model
         'total',
         'id_mesa',
         'codigo',
+        'observaciones',
         'id_usuario',
         'tipodeorden',
         'propina',

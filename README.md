@@ -20,3 +20,5 @@ Este sistema esta diseñado para poder funcionar como un sistema de ordenes loca
 * composer install
 * php artisan migrate:refresh --seed
 * php artisan serve
+
+### Agregados Buscador y Tambien el dashboard

@@ -48,6 +48,10 @@ Route::prefix('productos')->group(function () {
         Route::post('/admin/{id}', [App\Http\Controllers\ProductosController::class, 'actualizar'])->name('productos-admin-update');
         Route::delete('/admin/{id}', [App\Http\Controllers\ProductosController::class, 'delete'])->name('productos-admin-delete');
     });
+    Route::middleware(['auth:mesero'])->group(function () {
+        Route::post('/buscar', [App\Http\Controllers\ProductosController::class, 'buscarproductos'])->name('productos-buscar');
+   });
+    
 });
 
 Route::prefix('ordenes')->group(function () {
@@ -70,7 +74,12 @@ Route::prefix('ordenes')->group(function () {
         Route::put('/editpedido/{id}', [App\Http\Controllers\OrdenesController::class, 'edipedidomesero'])->name('ordenes-editarpedido-idorden');
     });
 });
-
+Route::prefix('dashboard')->group(function () {
+    Route::middleware(['auth:admin'])->group(function () {
+        Route::get('/show', [App\Http\Controllers\DashboardController::class, 'index_admin'])->name('dashboard-admin');
+        Route::post('/showdashboard', [App\Http\Controllers\DashboardController::class, 'fechadashboard'])->name('dashboard-admin-fechaget');
+    });
+});
 Route::middleware(['auth:mesero,admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 });

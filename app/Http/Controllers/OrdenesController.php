@@ -107,6 +107,7 @@ class OrdenesController extends Controller
                     'total' => $Valores['total'],
                     'id_mesa' => $Valores['id_mesa'],
                     'id_usuario'=>$Valores['id_usuario'],
+                    'observaciones'=>$Valores['observaciones'],
                     'tipodeorden'=>$Valores['tipodeorden'],
                     'propina'=>$Valores['propina']?$Valores['propina']:0,
                     'codigo'=>$mytime2.$Valores['id_mesa'].$Valores['id_usuario'],
@@ -186,6 +187,7 @@ class OrdenesController extends Controller
                     'id_mesa' => $Valores['id_mesa'],
                     'id_usuario'=>$Valores['id_usuario'],
                     'tipodeorden'=>$Valores['tipodeorden'],
+                    'observaciones'=>$Valores['observaciones'],
                     'propina'=>$Valores['propina']?$Valores['propina']:0,
                     'pagado'=>$Valores['pagado'],
                 ];
@@ -219,6 +221,7 @@ class OrdenesController extends Controller
     public function delete($id){
         Ordenes::find($id)->delete();
         ordenes_productos::where('id_orden', '=', $id)->delete();
+        Mesas::where('orden_active', '=', $id)->update(['active' => false,'orden_active' => null]);
         $DataOrdenes = Ordenes::select('Ordenes.*', 'users.name as nombremesero', 'mesas.name as nombremesa')->join('mesas', 'mesas.id', '=', 'ordenes.id_mesa')->join('users', 'users.id', '=', 'ordenes.id_usuario')->get();   
         return view('ordenes.tableview')
         ->with('DataOrdenes', $DataOrdenes);
@@ -283,6 +286,7 @@ class OrdenesController extends Controller
                     'id_mesa' => $id,
                     'id_usuario'=>$iduser,
                     'tipodeorden'=>'L',
+                    'observaciones'=>$Valores['observaciones'],
                     'propina'=>$Valores['propina']?$Valores['propina']:0,
                     'codigo'=>$mytime2.$id.$iduser,
                     'pagado'=>false,
@@ -362,6 +366,7 @@ class OrdenesController extends Controller
                 $valorOrden=[
                     'subtotal' => $Valores['subtotal'],
                     'total' => $Valores['total'],
+                    'observaciones'=>$Valores['observaciones'],
                     'propina'=>$Valores['propina']?$Valores['propina']:0,
                     'pagado'=>false,
                 ];

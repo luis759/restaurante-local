@@ -18,4 +18,16 @@ class Productos extends Model
         'productotipo',
         'precio',
     ];
+    public function scopeProductoTipo($query, $tipo) {
+    	if ($tipo!='A') {
+    		return $query->where('productotipo','=',"$tipo");
+    	}else{
+    		return $query;
+        }
+    }
+    public function scopeCart($query, $cart) {
+    	if ($cart) {
+    		return $query->where('cart','LIKE',"%$cart%");
+    	}
+    }
 }

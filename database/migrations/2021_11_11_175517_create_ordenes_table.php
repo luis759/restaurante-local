@@ -20,6 +20,7 @@ class CreateOrdenesTable extends Migration
             $table->float('total', 8, 2);
             $table->integer('id_mesa');
             $table->string('codigo');
+            $table->string('observaciones');
             $table->integer('id_usuario');
             $table->char('tipodeorden', 1);
             $table->boolean('pagado');

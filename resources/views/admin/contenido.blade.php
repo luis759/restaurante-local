@@ -43,5 +43,18 @@
             </div>
     </div>
 </div>
+<div class="row mt-4">
+    <div class="col-sm-6 col-12">
+            <div class="card">
+                <img src="{{asset('assets/img/dashboard.png')}}" class="card-img-top rounded mx-auto d-block" alt="..." style="height:250px;"> 
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Dashboard</h5>
+                        <p class="card-text" style="height:50px;">Ver todo lo relacionado a ventas.</p>
+                    </div>
+                    <a href="{{ route('dashboard-admin') }}" class="stretched-link"></a>
+            </div>
+            
+    </div>
+</div>
 
   

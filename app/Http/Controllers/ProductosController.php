@@ -9,7 +9,7 @@ class ProductosController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:admin');
+        $this->middleware('auth:admin,mesero');
         //$this->middleware('');
     }
       /**
@@ -187,5 +187,14 @@ class ProductosController extends Controller
         Productos::find($id)->delete();
         $DataProductos= Productos::all();
         return view('productos.tableview')->with('Dataproductos', $DataProductos);
+    }
+
+    public function buscarproductos(Request $request){
+        $input = $request->all();
+        $DataProductos= Productos::ProductoTipo($input['opcion'])->Cart($input['valorbuscar'])->get();
+        return response()->json([
+            'success' => true,
+            'productos'=>view('meseros.productosbuscar')->with('DataProductos',$DataProductos)->render()
+        ]);
     }
 }

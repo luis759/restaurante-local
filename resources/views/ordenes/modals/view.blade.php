@@ -10,7 +10,7 @@
                     <label for="name" class="col-12">CODIGO : {{$dataEdit->codigo}}</label>
                      <label for="name" class="col-12">FECHA : {{$dataEdit->fecha}}</label>
                 </div>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true">X</button>
                 
             </div>
 
@@ -66,6 +66,13 @@
 
                     <div class="col-12">
                     <div class="form-group row">
+                                <label for="observaciones"   class="col-sm-4 col-form-label">Observaciones :</label>
+                                <div class="col-sm-8">
+                                <input type="text" class="form-control" id="observaciones" placeholder="Comentario" value='{{$dataEdit->observaciones}}'>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="form-group row">
                         <label for="mesero"   class="col-sm-3 col-form-label">Producto *:</label>
                         <select class="selectpicker form-control col-sm-8"  style="width: 70%;" id="productos">  
                         <option value='{"dat":0,"dat1":0}' >Seleccion un Producto</option>
@@ -111,15 +118,15 @@
                         
                         </div>
                 </div>
-            
-            </div>
-            <div class="modal-footer">
+                <div class="modal-footer">
               <div class="col-12">
                     <label id="TotalFacturado" class="float-left">Total :</label>
                 <button type="button" class="btn btn-success float-right" id="botonmodal" onclick="clickbotonmodal()">{{isset($dataEdit->id)?'Guardar':'Agregar'}}</button>
                 </div>
               
-        </div>
+            </div>
+            </div>
+           
         </div>
    
     </div>
@@ -132,7 +139,8 @@
     $(document).ready( function () { 
         retirarData()
         $(".selectpicker").select2({
-            templateResult: formatState
+            templateResult: formatState, 
+            theme: "bootstrap-5",
         });
 
         $("#cantidad").change(function() {
@@ -255,6 +263,7 @@ function formatState (opt) {
                     total: total,
                     id_mesa:$("#Mesa").val(),
                     id_usuario: $('#mesero').val(),
+                    observaciones: $('#observaciones').val(),
                     tipodeorden:$('#delivery').is(":checked")?'D':'L',
                     propina:$('#propina').val(),
                     pagado:$('#pagado').is(":checked")?1:0,
@@ -279,6 +288,7 @@ function formatState (opt) {
                     total: total,
                     id_mesa:$("#Mesa").val(),
                     id_usuario: $('#mesero').val(),
+                    observaciones: $('#observaciones').val(),
                     tipodeorden:$('#delivery').is(":checked")?'D':'L',
                     propina:$('#propina').val(),
                     pagado:$('#pagado').is(":checked")?1:0,

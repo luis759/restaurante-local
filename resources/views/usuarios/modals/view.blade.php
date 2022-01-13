@@ -5,7 +5,8 @@
             
             <div class="modal-header">
                 <h4 class="modal-title" id="userCrudModal"></h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+              
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close" aria-hidden="true">X</button>
             </div>
 
             <div class="modal-body">
