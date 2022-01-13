@@ -22,3 +22,6 @@ Este sistema esta diseñado para poder funcionar como un sistema de ordenes loca
 * php artisan serve
 
 ### Agregados Buscador y Tambien el dashboard
+
+### OJO
+Debes colocar en la base de datos manualmente un campo observaciones en ordenes esto solo si ya hiciste la carga de data
